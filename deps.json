@@ -1,0 +1,22 @@
+{
+    "cabeca": [
+        "GL/freeglut",
+        "RgbImage"
+    ],
+    "RgbImage": [
+        "GL/freeglut",
+        "GL/gl"
+    ],
+    "garra": [
+        "GL/glut",
+        "RgbImage"
+    ],
+    "main": [
+        "GL/freeglut",
+        "GL/gl"
+    ],
+    "base": [
+        "GL/freeglut",
+        "GL/gl"
+    ]
+}

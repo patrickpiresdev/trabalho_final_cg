@@ -1,0 +1,1 @@
+python bm.py clear && python bm.py $1 && ./exe/$1.exe
