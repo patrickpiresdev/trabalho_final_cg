@@ -17,12 +17,29 @@ void init()
 {
 	glClearColor(0, 0, 0, 1);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_COLOR_MATERIAL);
+
+	float ambient[] = {0.5, 0.5, 0.5, 1};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+
+	glEnable(GL_LIGHT0);
+
+	float light0_ambient[] = {0.1, 0.1, 0.1, 1};
+	float light0_diffuse[] = {0.8, 0.8, 0.8, 1};
+	float light0_specular[] = {1, 1, 1, 1};
+	float light0_position[] = {0, 0, 1, 1};
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 }
 
 void display()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
