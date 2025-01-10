@@ -424,7 +424,7 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowPosition(20, 20);
 	glutInitWindowSize(800, 600);
-	glutCreateWindow("Cabeca de Robo");
+	glutCreateWindow("Robo");
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	init();
