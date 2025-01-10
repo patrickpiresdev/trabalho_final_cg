@@ -13,7 +13,8 @@
     ],
     "main": [
         "GL/freeglut",
-        "GL/gl"
+        "GL/gl",
+        "RgbImage"
     ],
     "base": [
         "GL/freeglut",
