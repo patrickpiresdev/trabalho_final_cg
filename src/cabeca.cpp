@@ -103,7 +103,9 @@ GLuint LoadTexture(char* filename) {
 		0,						//The border of the image
 		GL_RGB,					//GL_RGB, because pixels are stored in RGB format
 		GL_UNSIGNED_BYTE,		//GL_UNSIGNED_BYTE, because pixels are stored as unsigned numbers
-		theTexMap.ImageData());	//The actual pixel data
+		theTexMap.ImageData()   //The actual pixel data
+	);
+
 	return textureId; //Returns the id of the texture
 }
 

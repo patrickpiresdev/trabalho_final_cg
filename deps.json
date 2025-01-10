@@ -17,6 +17,7 @@
     ],
     "base": [
         "GL/freeglut",
-        "GL/gl"
+        "GL/gl",
+        "RgbImage"
     ]
 }
