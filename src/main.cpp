@@ -391,6 +391,20 @@ void cylinder(GLuint texture_id)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void cone(GLuint texture_id)
+{
+	GLUquadric* quad = gluNewQuadric();
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gluQuadricTexture(quad, TRUE);
+	gluCylinder(quad, 1, 0, 1, 32, 32);
+
+	// unbind texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void sphere(GLuint texture_id)
 {
 	GLUquadric* quad = gluNewQuadric();
@@ -429,6 +443,67 @@ void trunk()
 	glPopMatrix();
 }
 
+void nail()
+{
+	glPushMatrix();
+	glRotated(-45, 0, 1, 0);
+
+	glPushMatrix();
+	glScaled(0.1, 0.1, 1);
+	cylinder(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 0, 1);
+	glRotated(45, 0, 1, 0);
+
+	glPushMatrix();
+	glScaled(0.1, 0.1, 0.1);
+	sphere(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScaled(0.1, 0.1, 1);
+	cylinder(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 0, 1);
+	glScaled(0.1, 0.1, 0.1);
+	sphere(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 0, 1);
+	glRotated(45, 0, 1, 0);
+	glScaled(0.1, 0.1, 1);
+	cone(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void clamp()
+{
+	glPushMatrix();
+	glScaled(0.1, 0.1, 0.1);
+	sphere(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	nail();
+
+	glPushMatrix();
+	glRotated(180, 0, 0, 1);
+	nail();
+	glPopMatrix();
+}
+
+void arm()
+{
+	clamp();
+}
+
 void robot()
 {
 	/* glPushMatrix();
@@ -436,7 +511,9 @@ void robot()
 	cabeca();
 	glPopMatrix(); */
 
-	trunk();
+	// trunk();
+
+	arm();
 }
 
 void display()
@@ -480,19 +557,19 @@ void handle_camera_rotation(char key)
 	{
 		case 'w':
 		case 'W':
-			rot_x += 1;
+			rot_x += 2;
 			break;
 		case 's':
 		case 'S':
-			rot_x -= 1;
+			rot_x -= 2;
 			break;
 		case 'a':
 		case 'A':
-			rot_y += 1;
+			rot_y += 2;
 			break;
 		case 'd':
 		case 'D':
-			rot_y -= 1;
+			rot_y -= 2;
 			break;
 		default:
 			break;
