@@ -9,6 +9,8 @@
 #define HEAD_MOVEMENT_MODE '4'
 #define TRUNK_MOVEMENT_MODE '5'
 #define ROBOT_MOVEMENT_MODE '6'
+#define CAMERA_ZOOM_MODE '7'
+#define CAMERA_MOVEMENT_MODE '8'
 
 #define RIGHT_ARM '1'
 #define LEFT_ARM '2'
@@ -17,6 +19,9 @@ char movement_mode = CAMERA_ROTATION_MODE;
 
 float rot_x = 0;
 float rot_y = 0;
+float camera_zoom = -3;
+float camera_x = 0;
+float camera_y = 0;
 
 float left_arm_length = 2;
 int left_clamp_angle  = -45;
@@ -727,7 +732,7 @@ void display()
 	glLoadIdentity();
 
 	// draw
-	glTranslatef(0, 0, -5);
+	glTranslatef(-camera_x, -camera_y, camera_zoom);
 	glRotated(rot_x, 1, 0, 0);
 	glRotated(rot_y, 0, 1, 0);
 	grid();
@@ -748,7 +753,7 @@ void reshape(int w, int h)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(90, (float)w/h, 1, 100);
+	gluPerspective(90, (float)w/h, 0.1, 100);
 	// glOrtho(-1, 1, -1, 1, 0.1, 100);
 }
 
@@ -972,6 +977,51 @@ void handle_robot_movement(char key)
 	}
 }
 
+void handle_camera_zoom(char key)
+{
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			camera_zoom += 0.1;
+			break;
+		case 's':
+		case 'S':
+			camera_zoom -= 0.1;
+			break;
+		default:
+			break;
+	}
+
+	if (camera_zoom > -3)
+		camera_zoom = -3;
+}
+
+void handle_camera_movement(char key)
+{
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			camera_y += 0.1;
+			break;
+		case 's':
+		case 'S':
+			camera_y -= 0.1;
+			break;
+		case 'a':
+		case 'A':
+			camera_x -= 0.1;
+			break;
+		case 'd':
+		case 'D':
+			camera_x += 0.1;
+			break;
+		default:
+			break;
+	}
+}
+
 void handle_movement(char key)
 {
 	switch (movement_mode)
@@ -993,6 +1043,12 @@ void handle_movement(char key)
 			break;
 		case ROBOT_MOVEMENT_MODE:
 			handle_robot_movement(key);
+			break;
+		case CAMERA_ZOOM_MODE:
+			handle_camera_zoom(key);
+			break;
+		case CAMERA_MOVEMENT_MODE:
+			handle_camera_movement(key);
 			break;
 		default:
 			break;
