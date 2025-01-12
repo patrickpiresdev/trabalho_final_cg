@@ -8,6 +8,7 @@
 #define RIGHT_ARM_MOVEMENT_MODE '3'
 #define HEAD_MOVEMENT_MODE '4'
 #define TRUNK_MOVEMENT_MODE '5'
+#define ROBOT_MOVEMENT_MODE '6'
 
 #define RIGHT_ARM '1'
 #define LEFT_ARM '2'
@@ -31,6 +32,8 @@ int head_rot_x = 0;
 int head_rot_y = 0;
 
 int trunk_rot = 0;
+
+float robot_z = 0;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
 char* RUSTED_TEXTURE_FILENAME = "./textures/rusted_metal.bmp";
@@ -708,8 +711,12 @@ void upper_body()
 
 void robot()
 {
-	upper_body();
-	// lower_body();
+	glPushMatrix();
+		glTranslated(0, 2, 0);
+		upper_body();
+	glPopMatrix();
+
+	lower_body();
 }
 
 void display()
@@ -725,7 +732,11 @@ void display()
 	glRotated(rot_y, 0, 1, 0);
 	grid();
 
-	robot();
+	glPushMatrix();
+		glTranslated(0, 0, robot_z);
+		glScaled(0.5, 0.5, 0.5);
+		robot();
+	glPopMatrix();
 	// end draw
 
 	glutSwapBuffers();
@@ -944,6 +955,23 @@ void handle_trunk_movement(char key)
 		trunk_rot = -90;
 }
 
+void handle_robot_movement(char key)
+{
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			robot_z += 0.1;
+			break;
+		case 's':
+		case 'S':
+			robot_z -= 0.1;
+			break;
+		default:
+			break;
+	}
+}
+
 void handle_movement(char key)
 {
 	switch (movement_mode)
@@ -962,6 +990,9 @@ void handle_movement(char key)
 			break;
 		case TRUNK_MOVEMENT_MODE:
 			handle_trunk_movement(key);
+			break;
+		case ROBOT_MOVEMENT_MODE:
+			handle_robot_movement(key);
 			break;
 		default:
 			break;
