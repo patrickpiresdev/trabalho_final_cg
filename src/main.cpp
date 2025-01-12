@@ -556,6 +556,19 @@ void arm(float length, int clamp_angle)
 	glPopMatrix();
 }
 
+void waist()
+{
+	glPushMatrix();
+	glScaled(1, 0.5, 0.5);
+	DesenhaCubo(RUGGED_TEXTURE_ID, 1, 1, 1);
+	glPopMatrix();
+}
+
+void bottom()
+{
+	// waist();
+}
+
 void robot()
 {
 	/* glPushMatrix();
@@ -565,7 +578,7 @@ void robot()
 
 	// trunk();
 
-	glPushMatrix();
+	/* glPushMatrix();
 	glTranslated(1, 0, 0);
 	arm(left_arm_length, left_clamp_angle);
 	glPopMatrix();
@@ -573,7 +586,9 @@ void robot()
 	glPushMatrix();
 	glTranslated(-1, 0, 0);
 	arm(right_arm_length, right_clamp_angle);
-	glPopMatrix();
+	glPopMatrix(); */
+
+	bottom();
 }
 
 void display()
