@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include "GL/freeglut.h"
 #include "RgbImage.h"
+#define CAMERA_ROTATION_MODE '1'
 
+char movement_mode = CAMERA_ROTATION_MODE;
 float rot_x = 0, rot_y = 0;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
@@ -48,7 +50,7 @@ GLuint load_texture(char* filename)
 
 void grid()
 {
-	glLineWidth(3);
+	glLineWidth(2);
 	glBegin(GL_LINES);
 	for (int i = -100; i <= 100; i++)
 	{
@@ -62,7 +64,7 @@ void grid()
 
 void init()
 {
-	glClearColor(0, 0, 0, 1);
+	glClearColor(0.3, 0.3, 0.3, 1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
@@ -142,6 +144,7 @@ void DesenhaCubo(GLuint _textureId, float lenghtX, float lenghtY, float height)
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(lenghtX, -lenghtY, height);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(-lenghtX, -lenghtY, height);
 	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 // Fun��o que desenha um bast�o com uma luz no final
@@ -174,6 +177,7 @@ void DesenhaBastao(float diam_start, float diam_end, float lenght, float radius,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	gluQuadricTexture(GLASS_QUAD, TRUE);
 	gluSphere(GLASS_QUAD, radius, 72, 72);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void DesenhaParteCoroa(float base, float top, float length, float height)
@@ -188,6 +192,7 @@ void DesenhaParteCoroa(float base, float top, float length, float height)
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(top, length, height);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(base, 0, 0);
 	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void cabeca()
@@ -368,6 +373,20 @@ void cabeca()
 	gluSphere(GLASS_QUAD, 40.0f, 72, 72);
 	glDisable(GL_CULL_FACE);
 	glPopMatrix();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void cylinder()
+{
+	glBindTexture(GL_TEXTURE_2D, GOLDEN_TEXTURE_ID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gluQuadricTexture(GOLDEN_QUAD, TRUE);
+	GLUquadric* quad = gluNewQuadric();
+	gluCylinder(quad, 1, 1, 1, 32, 32);
+	// unbind texture
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void display()
@@ -378,20 +397,21 @@ void display()
 	glLoadIdentity();
 
 	// draw
-	glTranslatef(0, 0, -2);
+	glTranslatef(0, 0, -5);
 	glRotated(rot_x, 1, 0, 0);
+	glRotated(rot_y, 0, 1, 0);
 	grid();
 
 	glPushMatrix();
-
-	glTranslatef(0, 0, -2);
 	glScalef(0.02, 0.02, 0.02);
-	// glRotatef(rot_x, 1, 0, 0);
-	// glRotatef(rot_y, 0, 1, 0);
-
 	cabeca();
-
 	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(0.1, 0.1, 1);
+	cylinder();
+	glPopMatrix();
+	// end draw
 
 	glutSwapBuffers();
 }
@@ -406,16 +426,63 @@ void reshape(int w, int h)
 	// glOrtho(-1, 1, -1, 1, 0.1, 100);
 }
 
-float i = 0.5;
 void timer(int value)
 {
-	rot_x += i;
-	rot_y += 1;
 	glutPostRedisplay();
 	glutTimerFunc(1000/60, timer, 0);
+}
 
-	if (rot_x >= 45 || rot_x <= -45)
-		i *= -1;
+void handle_camera_rotation(char key)
+{
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			rot_x += 1;
+			break;
+		case 's':
+		case 'S':
+			rot_x -= 1;
+			break;
+		case 'a':
+		case 'A':
+			rot_y += 1;
+			break;
+		case 'd':
+		case 'D':
+			rot_y -= 1;
+			break;
+		default:
+			break;
+	}
+}
+
+void handle_movement(char key)
+{
+	switch (movement_mode)
+	{
+		case CAMERA_ROTATION_MODE:
+			handle_camera_rotation(key);
+			break;
+		default:
+			break;
+	}
+}
+
+void handle_keyboard(unsigned char key, int x, int y)
+{
+	if ('1' <= key && key <= '9')
+	{
+		movement_mode = key;
+	}
+	else if (
+		key == 'w' || key == 'W' ||
+		key == 'a' || key == 'A' ||
+		key == 's' || key == 'S' ||
+		key == 'd' || key == 'D'
+	) {
+		handle_movement(key);
+	}
 }
 
 int main(int argc, char **argv)
@@ -427,6 +494,7 @@ int main(int argc, char **argv)
 	glutCreateWindow("Robo");
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
+	glutKeyboardFunc(handle_keyboard);
 	init();
 	glutTimerFunc(1000/60, timer, 0);
 	glutMainLoop();
