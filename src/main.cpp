@@ -627,7 +627,7 @@ void leg()
 	foot();
 }
 
-void bottom()
+void lower_body()
 {
 	glPushMatrix();
 	glTranslated(0, 1.75, 0);
@@ -647,7 +647,7 @@ void bottom()
 	glPopMatrix();
 }
 
-void robot()
+void upper_body()
 {
 	/* glPushMatrix();
 	glScalef(0.02, 0.02, 0.02);
@@ -656,7 +656,7 @@ void robot()
 
 	// trunk();
 
-	/* glPushMatrix();
+	glPushMatrix();
 	glTranslated(1, 0, 0);
 	arm(left_arm_length, left_clamp_angle);
 	glPopMatrix();
@@ -664,9 +664,13 @@ void robot()
 	glPushMatrix();
 	glTranslated(-1, 0, 0);
 	arm(right_arm_length, right_clamp_angle);
-	glPopMatrix(); */
+	glPopMatrix();
+}
 
-	bottom();
+void robot()
+{
+	// upper_body();
+	lower_body();
 }
 
 void display()
