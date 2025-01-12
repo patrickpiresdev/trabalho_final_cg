@@ -501,9 +501,44 @@ void clamp()
 	glPopMatrix();
 }
 
+void disk(GLuint texture_id)
+{
+	GLUquadric* quad = gluNewQuadric();
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gluQuadricTexture(quad, TRUE);
+	gluDisk(quad, 0, 1, 32, 32);
+
+	// unbind texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void arm()
 {
+	glPushMatrix();
+	glScaled(0.3, 0.3, 0.3);
+	sphere(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScaled(0.3, 0.3, 2);
+	cylinder(RUGGED_TEXTURE_ID);
+	glPopMatrix();
+
+	// lid
+	glPushMatrix();
+	glTranslated(0, 0, 2);
+	glScaled(0.3, 0.3, 1);
+	disk(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(0, 0, 2);
+	glScaled(0.5, 0.5, 0.5);
 	clamp();
+	glPopMatrix();
 }
 
 void robot()
