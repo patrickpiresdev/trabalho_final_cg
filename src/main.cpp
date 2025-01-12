@@ -7,6 +7,7 @@
 #define LEFT_ARM_MOVEMENT_MODE '2'
 #define RIGHT_ARM_MOVEMENT_MODE '3'
 #define HEAD_MOVEMENT_MODE '4'
+#define TRUNK_MOVEMENT_MODE '5'
 
 #define RIGHT_ARM '1'
 #define LEFT_ARM '2'
@@ -28,6 +29,8 @@ int right_arm_rot_y    = 0;
 
 int head_rot_x = 0;
 int head_rot_y = 0;
+
+int trunk_rot = 0;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
 char* RUSTED_TEXTURE_FILENAME = "./textures/rusted_metal.bmp";
@@ -646,6 +649,23 @@ void leg()
 	foot();
 }
 
+void arms()
+{
+	glPushMatrix();
+	glTranslated(1, 0, 0);
+	glRotated(left_arm_rot_y, 0, 1, 0);
+	glRotated(left_arm_rot_x, 1, 0, 0);
+	arm(left_arm_length, left_clamp_angle);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(-1, 0, 0);
+	glRotated(right_arm_rot_y, 0, 1, 0);
+	glRotated(right_arm_rot_x, 1, 0, 0);
+	arm(right_arm_length, right_clamp_angle);
+	glPopMatrix();
+}
+
 void lower_body()
 {
 	glPushMatrix();
@@ -675,21 +695,15 @@ void upper_body()
 	cabeca();
 	glPopMatrix();
 
-	trunk();
-
-	/* glPushMatrix();
-	glTranslated(1, 0, 0);
-	glRotated(left_arm_rot_y, 0, 1, 0);
-	glRotated(left_arm_rot_x, 1, 0, 0);
-	arm(left_arm_length, left_clamp_angle);
-	glPopMatrix();
-
 	glPushMatrix();
-	glTranslated(-1, 0, 0);
-	glRotated(right_arm_rot_y, 0, 1, 0);
-	glRotated(right_arm_rot_x, 1, 0, 0);
-	arm(right_arm_length, right_clamp_angle);
-	glPopMatrix(); */
+		glRotated(trunk_rot, 0, 1, 0);
+		trunk();
+
+		glPushMatrix();
+			glTranslated(0, 0.7, 0);
+			arms();
+		glPopMatrix();
+	glPopMatrix();
 }
 
 void robot()
@@ -908,6 +922,28 @@ void handle_head_movement(char key)
 		head_rot_y = -90;
 }
 
+void handle_trunk_movement(char key)
+{
+	switch (key)
+	{
+		case 'a':
+		case 'A':
+			trunk_rot += 5;
+			break;
+		case 'd':
+		case 'D':
+			trunk_rot -= 5;
+			break;
+		default:
+			break;
+	}
+
+	if (trunk_rot > 90)
+		trunk_rot = 90;
+	if (trunk_rot < -90)
+		trunk_rot = -90;
+}
+
 void handle_movement(char key)
 {
 	switch (movement_mode)
@@ -923,6 +959,9 @@ void handle_movement(char key)
 			break;
 		case HEAD_MOVEMENT_MODE:
 			handle_head_movement(key);
+			break;
+		case TRUNK_MOVEMENT_MODE:
+			handle_trunk_movement(key);
 			break;
 		default:
 			break;
