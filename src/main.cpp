@@ -206,6 +206,50 @@ void DesenhaParteCoroa(float base, float top, float length, float height)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void trapezoidal_prism(GLuint texture) {
+    glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBegin(GL_QUADS);
+
+    // Base inferior
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, -1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 0.0f, -1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(1.0f, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-1.0f, 0.0f, 1.0f);
+
+    // Base superior
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 1.0f, -0.5f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.5f, 1.0f, -0.5f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 1.0f, 0.5f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 1.0f, 0.5f);
+
+    // Lados
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, -1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 0.0f, -1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 1.0f, -0.5f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 1.0f, -0.5f);
+
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0f, 0.0f, -1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(1.0f, 0.0f, 1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.5f, 1.0f, 0.5f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, 1.0f, -0.5f);
+
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(1.0f, 0.0f, 1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, 0.0f, 1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 1.0f, 0.5f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.5f, 1.0f, 0.5f);
+
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-1.0f, 0.0f, 1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-1.0f, 0.0f, -1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 1.0f, -0.5f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 1.0f, 0.5f);
+
+    glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void cabeca()
 {
 	// Desenha pesco�o (cone)
@@ -559,14 +603,48 @@ void arm(float length, int clamp_angle)
 void waist()
 {
 	glPushMatrix();
-	glScaled(1, 0.5, 0.5);
+	glScaled(0.75, 0.25, 0.5);
 	DesenhaCubo(RUGGED_TEXTURE_ID, 1, 1, 1);
 	glPopMatrix();
 }
 
+void foot()
+{
+	glPushMatrix();
+	glScaled(0.5, 0.5, 1);
+	trapezoidal_prism(METAL_TEXTURE_ID);
+	glPopMatrix();
+}
+
+void leg()
+{
+	glPushMatrix();
+	glTranslated(0, 1, 0);
+	glScaled(0.25, 0.5, 0.5);
+	DesenhaCubo(RUGGED_TEXTURE_ID, 1, 1, 1);
+	glPopMatrix();
+
+	foot();
+}
+
 void bottom()
 {
-	// waist();
+	glPushMatrix();
+	glTranslated(0, 1.75, 0);
+	waist();
+	glPopMatrix();
+
+	// left leg
+	glPushMatrix();
+	glTranslated(0.5, 0, 0);
+	leg();
+	glPopMatrix();
+
+	// right leg
+	glPushMatrix();
+	glTranslated(-0.5, 0, 0);
+	leg();
+	glPopMatrix();
 }
 
 void robot()
