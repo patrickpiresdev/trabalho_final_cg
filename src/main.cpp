@@ -6,6 +6,7 @@
 #define CAMERA_ROTATION_MODE '1'
 #define LEFT_ARM_MOVEMENT_MODE '2'
 #define RIGHT_ARM_MOVEMENT_MODE '3'
+#define HEAD_MOVEMENT_MODE '4'
 
 #define RIGHT_ARM '1'
 #define LEFT_ARM '2'
@@ -24,6 +25,9 @@ float right_arm_length = 2;
 int right_clamp_angle  = -45;
 int right_arm_rot_x    = 0;
 int right_arm_rot_y    = 0;
+
+int head_rot_x = 0;
+int head_rot_y = 0;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
 char* RUSTED_TEXTURE_FILENAME = "./textures/rusted_metal.bmp";
@@ -257,7 +261,7 @@ void trapezoidal_prism(GLuint texture) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void cabeca()
+void cabeca2()
 {
 	// Desenha pesco�o (cone)
 	glColor4f(0.3f, 0.3f, 0.3f, 1.0f);
@@ -437,6 +441,14 @@ void cabeca()
 	glPopMatrix();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void cabeca()
+{
+	glPushMatrix();
+	glScalef(0.017, 0.017, 0.017);
+	cabeca2();
+	glPopMatrix();
 }
 
 void cylinder(GLuint texture_id)
@@ -656,14 +668,16 @@ void lower_body()
 
 void upper_body()
 {
-	/* glPushMatrix();
-	glScalef(0.02, 0.02, 0.02);
-	cabeca();
-	glPopMatrix(); */
-
-	// trunk();
-
 	glPushMatrix();
+	glTranslated(0, 1.4, 0);
+	glRotated(head_rot_x, 1, 0, 0);
+	glRotated(head_rot_y, 0, 1, 0);
+	cabeca();
+	glPopMatrix();
+
+	trunk();
+
+	/* glPushMatrix();
 	glTranslated(1, 0, 0);
 	glRotated(left_arm_rot_y, 0, 1, 0);
 	glRotated(left_arm_rot_x, 1, 0, 0);
@@ -675,7 +689,7 @@ void upper_body()
 	glRotated(right_arm_rot_y, 0, 1, 0);
 	glRotated(right_arm_rot_x, 1, 0, 0);
 	arm(right_arm_length, right_clamp_angle);
-	glPopMatrix();
+	glPopMatrix(); */
 }
 
 void robot()
@@ -859,6 +873,41 @@ void handle_arm_movement(char key, char arm)
 	handle_arm_rotation(key, arm);
 }
 
+void handle_head_movement(char key)
+{
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			head_rot_x += 5;
+			break;
+		case 's':
+		case 'S':
+			head_rot_x -= 5;
+			break;
+		case 'a':
+		case 'A':
+			head_rot_y += 5;
+			break;
+		case 'd':
+		case 'D':
+			head_rot_y -= 5;
+			break;
+		default:
+			break;
+	}
+
+	if (head_rot_x > 45)
+		head_rot_x = 45;
+	if (head_rot_x < -45)
+		head_rot_x = -45;
+
+	if (head_rot_y > 90)
+		head_rot_y = 90;
+	if (head_rot_y < -90)
+		head_rot_y = -90;
+}
+
 void handle_movement(char key)
 {
 	switch (movement_mode)
@@ -871,6 +920,9 @@ void handle_movement(char key)
 			break;
 		case RIGHT_ARM_MOVEMENT_MODE:
 			handle_arm_movement(key, RIGHT_ARM);
+			break;
+		case HEAD_MOVEMENT_MODE:
+			handle_head_movement(key);
 			break;
 		default:
 			break;
