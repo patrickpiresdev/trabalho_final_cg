@@ -1,12 +1,21 @@
 #include <stdio.h>
+#include <windows.h>
 #include "GL/freeglut.h"
 #include "RgbImage.h"
+
 #define CAMERA_ROTATION_MODE '1'
-#define CLAMP_MOVEMENT_MODE '2'
+#define LEFT_ARM_MOVEMENT_MODE '2'
+#define RIGHT_ARM_MOVEMENT_MODE '3'
+
+#define RIGHT_ARM '1'
+#define LEFT_ARM '2'
 
 char movement_mode = CAMERA_ROTATION_MODE;
 float rot_x = 0, rot_y = 0;
-int nail_angle = -45;
+float left_arm_length = 2;
+int left_clamp_angle = -45;
+float right_arm_length = 2;
+int right_clamp_angle = -45;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
 char* RUSTED_TEXTURE_FILENAME = "./textures/rusted_metal.bmp";
@@ -445,10 +454,10 @@ void trunk()
 	glPopMatrix();
 }
 
-void nail()
+void finger(int angle)
 {
 	glPushMatrix();
-	glRotated(nail_angle, 0, 1, 0);
+	glRotated(angle, 0, 1, 0);
 
 	glPushMatrix();
 	glScaled(0.1, 0.1, 1);
@@ -486,18 +495,18 @@ void nail()
 	glPopMatrix();
 }
 
-void clamp()
+void clamp(int angle)
 {
 	glPushMatrix();
 	glScaled(0.1, 0.1, 0.1);
 	sphere(METAL_TEXTURE_ID);
 	glPopMatrix();
 
-	nail();
+	finger(angle);
 
 	glPushMatrix();
 	glRotated(180, 0, 0, 1);
-	nail();
+	finger(angle);
 	glPopMatrix();
 }
 
@@ -515,29 +524,35 @@ void disk(GLuint texture_id)
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void arm()
+void arm(float length, int clamp_angle)
 {
+	if (length < 1)
+		length = 1;
+
+	if (length > 5)
+		length = 5;
+
 	glPushMatrix();
 	glScaled(0.3, 0.3, 0.3);
 	sphere(METAL_TEXTURE_ID);
 	glPopMatrix();
 
 	glPushMatrix();
-	glScaled(0.3, 0.3, 2);
+	glScaled(0.3, 0.3, length);
 	cylinder(RUGGED_TEXTURE_ID);
 	glPopMatrix();
 
 	// lid
 	glPushMatrix();
-	glTranslated(0, 0, 2);
+	glTranslated(0, 0, length);
 	glScaled(0.3, 0.3, 1);
 	disk(METAL_TEXTURE_ID);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslated(0, 0, 2);
+	glTranslated(0, 0, length);
 	glScaled(0.5, 0.5, 0.5);
-	clamp();
+	clamp(clamp_angle);
 	glPopMatrix();
 }
 
@@ -550,7 +565,15 @@ void robot()
 
 	// trunk();
 
-	arm();
+	glPushMatrix();
+	glTranslated(1, 0, 0);
+	arm(left_arm_length, left_clamp_angle);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(-1, 0, 0);
+	arm(right_arm_length, right_clamp_angle);
+	glPopMatrix();
 }
 
 void display()
@@ -613,28 +636,70 @@ void handle_camera_rotation(char key)
 	}
 }
 
-void handle_clamp_movement(char key)
+void handle_clamp_movement(char key, char arm)
 {
-	int tmp_angle = nail_angle;
+	int tmp_angle = arm == LEFT_ARM ? left_clamp_angle : right_clamp_angle;
 
 	switch (key)
 	{
-		case 'w':
-		case 'W':
+		case 'q':
+		case 'Q':
 			tmp_angle += 5;
 			break;
-		case 's':
-		case 'S':
+		case 'e':
+		case 'E':
 			tmp_angle -= 5;
 			break;
 		default:
 			break;
 	}
 
-	if (tmp_angle > -45 || tmp_angle < -90 )
-		return;
+	if (tmp_angle > -45)
+		tmp_angle = -45;
+	if (tmp_angle < -90 )
+		tmp_angle = -90;
 
-	nail_angle = tmp_angle;
+	if (arm == LEFT_ARM)
+		left_clamp_angle = tmp_angle;
+	else
+		right_clamp_angle = tmp_angle;
+}
+
+void handle_arm_stretch(char key, char arm)
+{
+	float tmp_length = arm == LEFT_ARM ? left_arm_length : right_arm_length;
+
+	switch (key)
+	{
+		case 'z':
+		case 'Z':
+			tmp_length += 0.1;
+			break;
+		case 'c':
+		case 'C':
+			tmp_length -= 0.1;
+			break;
+		default:
+			break;
+	}
+
+	if (tmp_length > 5)
+		tmp_length = 5;
+
+	if (tmp_length < 1)
+		tmp_length = 1;
+
+	if (arm == LEFT_ARM)
+		left_arm_length = tmp_length;
+	else
+		right_arm_length = tmp_length;
+}
+
+void handle_arm_movement(char key, char arm)
+{
+	handle_arm_stretch(key, arm);
+	handle_clamp_movement(key, arm);
+	// implement rotation
 }
 
 void handle_movement(char key)
@@ -644,8 +709,11 @@ void handle_movement(char key)
 		case CAMERA_ROTATION_MODE:
 			handle_camera_rotation(key);
 			break;
-		case CLAMP_MOVEMENT_MODE:
-			handle_clamp_movement(key);
+		case LEFT_ARM_MOVEMENT_MODE:
+			handle_arm_movement(key, LEFT_ARM);
+			break;
+		case RIGHT_ARM_MOVEMENT_MODE:
+			handle_arm_movement(key, RIGHT_ARM);
 			break;
 		default:
 			break;
@@ -659,12 +727,8 @@ void handle_keyboard(unsigned char key, int x, int y)
 		movement_mode = key;
 		printf("Movement mode: %c\n", movement_mode);
 	}
-	else if (
-		key == 'w' || key == 'W' ||
-		key == 'a' || key == 'A' ||
-		key == 's' || key == 'S' ||
-		key == 'd' || key == 'D'
-	) {
+	else
+	{
 		handle_movement(key);
 	}
 }
