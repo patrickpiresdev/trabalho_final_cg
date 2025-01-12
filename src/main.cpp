@@ -11,11 +11,19 @@
 #define LEFT_ARM '2'
 
 char movement_mode = CAMERA_ROTATION_MODE;
-float rot_x = 0, rot_y = 0;
+
+float rot_x = 0;
+float rot_y = 0;
+
 float left_arm_length = 2;
-int left_clamp_angle = -45;
+int left_clamp_angle  = -45;
+int left_arm_rot_x    = 0;
+int left_arm_rot_y    = 0;
+
 float right_arm_length = 2;
-int right_clamp_angle = -45;
+int right_clamp_angle  = -45;
+int right_arm_rot_x    = 0;
+int right_arm_rot_y    = 0;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
 char* RUSTED_TEXTURE_FILENAME = "./textures/rusted_metal.bmp";
@@ -57,7 +65,6 @@ GLuint load_texture(char* filename)
 
 	return textureId; //Returns the id of the texture
 }
-
 
 void grid()
 {
@@ -658,19 +665,23 @@ void upper_body()
 
 	glPushMatrix();
 	glTranslated(1, 0, 0);
+	glRotated(left_arm_rot_y, 0, 1, 0);
+	glRotated(left_arm_rot_x, 1, 0, 0);
 	arm(left_arm_length, left_clamp_angle);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslated(-1, 0, 0);
+	glRotated(right_arm_rot_y, 0, 1, 0);
+	glRotated(right_arm_rot_x, 1, 0, 0);
 	arm(right_arm_length, right_clamp_angle);
 	glPopMatrix();
 }
 
 void robot()
 {
-	// upper_body();
-	lower_body();
+	upper_body();
+	// lower_body();
 }
 
 void display()
@@ -792,11 +803,60 @@ void handle_arm_stretch(char key, char arm)
 		right_arm_length = tmp_length;
 }
 
+void handle_arm_rotation(char key, char arm)
+{
+	int tmp_rot_x = arm == LEFT_ARM ? left_arm_rot_x : right_arm_rot_x;
+	int tmp_rot_y = arm == LEFT_ARM ? left_arm_rot_y : right_arm_rot_y;
+
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			tmp_rot_x -= 5;
+			break;
+		case 's':
+		case 'S':
+			tmp_rot_x += 5;
+			break;
+		case 'a':
+		case 'A':
+			tmp_rot_y += 5;
+			break;
+		case 'd':
+		case 'D':
+			tmp_rot_y -= 5;
+			break;
+		default:
+			break;
+	}
+
+	if (tmp_rot_x > 90)
+		tmp_rot_x = 90;
+	if (tmp_rot_x < -90)
+		tmp_rot_x = -90;
+
+	if (tmp_rot_y > 90)
+		tmp_rot_y = 90;
+	if (tmp_rot_y < -90)
+		tmp_rot_y = -90;
+
+	if (arm == LEFT_ARM)
+	{
+		left_arm_rot_x = tmp_rot_x;
+		left_arm_rot_y = tmp_rot_y;
+	}
+	else
+	{
+		right_arm_rot_x = tmp_rot_x;
+		right_arm_rot_y = tmp_rot_y;
+	}
+}
+
 void handle_arm_movement(char key, char arm)
 {
 	handle_arm_stretch(key, arm);
 	handle_clamp_movement(key, arm);
-	// implement rotation
+	handle_arm_rotation(key, arm);
 }
 
 void handle_movement(char key)
