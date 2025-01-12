@@ -377,16 +377,66 @@ void cabeca()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void cylinder()
+void cylinder(GLuint texture_id)
 {
-	glBindTexture(GL_TEXTURE_2D, GOLDEN_TEXTURE_ID);
+	GLUquadric* quad = gluNewQuadric();
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	gluQuadricTexture(GOLDEN_QUAD, TRUE);
-	GLUquadric* quad = gluNewQuadric();
+	gluQuadricTexture(quad, TRUE);
 	gluCylinder(quad, 1, 1, 1, 32, 32);
+
 	// unbind texture
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void sphere(GLuint texture_id)
+{
+	GLUquadric* quad = gluNewQuadric();
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gluQuadricTexture(quad, TRUE);
+	gluSphere(quad, 1, 32, 32);
+
+	// unbind texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void trunk()
+{
+	glPushMatrix();
+	glTranslatef(0, 0.2, 0);
+
+	glPushMatrix();
+	glTranslated(0, 1, 0);
+	glScaled(1, 0.2, 1);
+	sphere(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glRotated(-90, 1, 0, 0);
+	cylinder(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScaled(1, 0.2, 1);
+	sphere(METAL_TEXTURE_ID);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void robot()
+{
+	/* glPushMatrix();
+	glScalef(0.02, 0.02, 0.02);
+	cabeca();
+	glPopMatrix(); */
+
+	trunk();
 }
 
 void display()
@@ -402,15 +452,7 @@ void display()
 	glRotated(rot_y, 0, 1, 0);
 	grid();
 
-	glPushMatrix();
-	glScalef(0.02, 0.02, 0.02);
-	cabeca();
-	glPopMatrix();
-
-	glPushMatrix();
-	glScalef(0.1, 0.1, 1);
-	cylinder();
-	glPopMatrix();
+	robot();
 	// end draw
 
 	glutSwapBuffers();
