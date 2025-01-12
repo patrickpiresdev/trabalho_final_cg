@@ -2,9 +2,11 @@
 #include "GL/freeglut.h"
 #include "RgbImage.h"
 #define CAMERA_ROTATION_MODE '1'
+#define CLAMP_MOVEMENT_MODE '2'
 
 char movement_mode = CAMERA_ROTATION_MODE;
 float rot_x = 0, rot_y = 0;
+int nail_angle = -45;
 
 char* RUGGED_TEXTURE_FILENAME = "./textures/rugged_metal.bmp";
 char* RUSTED_TEXTURE_FILENAME = "./textures/rusted_metal.bmp";
@@ -446,7 +448,7 @@ void trunk()
 void nail()
 {
 	glPushMatrix();
-	glRotated(-45, 0, 1, 0);
+	glRotated(nail_angle, 0, 1, 0);
 
 	glPushMatrix();
 	glScaled(0.1, 0.1, 1);
@@ -576,12 +578,39 @@ void handle_camera_rotation(char key)
 	}
 }
 
+void handle_clamp_movement(char key)
+{
+	int tmp_angle = nail_angle;
+
+	switch (key)
+	{
+		case 'w':
+		case 'W':
+			tmp_angle += 5;
+			break;
+		case 's':
+		case 'S':
+			tmp_angle -= 5;
+			break;
+		default:
+			break;
+	}
+
+	if (tmp_angle > -45 || tmp_angle < -90 )
+		return;
+
+	nail_angle = tmp_angle;
+}
+
 void handle_movement(char key)
 {
 	switch (movement_mode)
 	{
 		case CAMERA_ROTATION_MODE:
 			handle_camera_rotation(key);
+			break;
+		case CLAMP_MOVEMENT_MODE:
+			handle_clamp_movement(key);
 			break;
 		default:
 			break;
@@ -593,6 +622,7 @@ void handle_keyboard(unsigned char key, int x, int y)
 	if ('1' <= key && key <= '9')
 	{
 		movement_mode = key;
+		printf("Movement mode: %c\n", movement_mode);
 	}
 	else if (
 		key == 'w' || key == 'W' ||
