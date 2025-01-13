@@ -1,5 +1,7 @@
 # Robo (Perdidos no Espaço)
 
+Link para o github: [https://github.com/patrickpiresdev/trabalho_final_cg](https://github.com/patrickpiresdev/trabalho_final_cg)
+
 ## Instruções para execução
 Para executar o programa, basta seguir os passos abaixo ou assistir o vídeo de demonstração disponível no link [https://youtu.be/Kj6UwRKHefY](https://youtu.be/Kj6UwRKHefY).
 
