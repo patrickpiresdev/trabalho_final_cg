@@ -1,6 +1,8 @@
 # Robo (Perdidos no Espaço)
 
 ## Instruções para execução
+Para executar o programa, basta seguir os passos abaixo ou assistir o vídeo de demonstração disponível no link [https://youtu.be/Kj6UwRKHefY](https://youtu.be/Kj6UwRKHefY).
+
 Basta executar `./exe/main.exe` estando no diretório onde este `README` se encontra, i.e., na pasta do projeto.
 
 ## Instruções para uso
